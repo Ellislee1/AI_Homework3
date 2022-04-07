@@ -35,18 +35,22 @@ class Environment:
 
     
     def checkOver(self, key):
+        """
+        Check that the game is finished after each players move (check win condition of a player)
+        """
         if np.count_nonzero(self.grid == key) < self.to_win:
             return False
         
         for i in range(self.grid.shape[0]):
-            unique, counts = np.unique(self.grid[i,:], return_counts=True)
-            if key in unique[0] and counts[0] >= self.to_win:
-                return True
+            temp = self.grid[i,:].flatten()
+            if np.count_nonzero(temp == key) < self.to_win:
+                continue
+            run_ends = np.where(np.diff(temp))[0] + 1
+            f = np.hstack((0, run_ends, temp.size))
+            print(f)
+            d = np.diff(f).max()
+            print(d)
 
-        for i in range(self.grid.shape[1]):
-            unique, counts = np.unique(self.grid[:,i], return_counts=True)
-            if len(unique) == 1 and unique[0] == key and counts[0] >= self.to_win:
-                return True
         
         return False
 
