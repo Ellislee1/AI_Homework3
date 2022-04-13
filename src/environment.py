@@ -10,9 +10,12 @@ class Environment:
         self.player_1 = player1
         self.player_2 = player2
 
-        self.turn = np.random.choice([self.player_1,self.player_2],1)[0]
-
         self.winner = None
+
+    def play(self, turn = None):
+        self.turn = turn
+        if self.turn is None:
+            self.turn = np.random.choice([self.player_1,self.player_2],1)[0]
 
         while self.winner is None:
             self.nextTurn()
@@ -59,7 +62,7 @@ class Environment:
         if checkLongest(np.diagonal(self.grid.copy(), offset = last_pos[1]-last_pos[0]), key, self.to_win):
             return True, 1
         # Check inverse diagonal
-        if checkLongest(np.flip(np.diagonal(np.rot90(self.grid.copy()), offset = -self.grid.shape[1]+(last_pos[1]+last_pos[0])+1)), key, self.to_win):
+        if checkLongest(np.diagonal(np.rot90(self.grid.copy()), offset = -self.grid.shape[1]+(last_pos[1]+last_pos[0])+1), key, self.to_win):
             return True, 1
         # check plays remaining
         if np.count_nonzero(self.grid==0) == 0:
@@ -67,9 +70,6 @@ class Environment:
 
 
         return False, 0
-
-        
-
 
     def getState(self):
         state = {
