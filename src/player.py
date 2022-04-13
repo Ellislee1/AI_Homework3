@@ -12,7 +12,9 @@ class Player:
     def humanTurn(self, env):
         state = env.getState()['grid']
         print(f'The state is:\n {state}')
-        pos = int(input("Where would you like to place?"))
+        pos = input("Where would you like to place?").split(',')
+        for i, val in enumerate(pos):
+            pos[i] = int(val)
 
-        env.place(pos)
+        env.place(pos[1],pos[0])
 

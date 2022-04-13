@@ -1,4 +1,6 @@
 import numpy as np
+from numpy.lib.twodim_base import diag
+import numba as nb
 
 class Environment:
     def __init__(self, player1, player2, grid_shape = (3,3), to_win = 3):
@@ -10,49 +12,61 @@ class Environment:
 
         self.turn = np.random.choice([self.player_1,self.player_2],1)[0]
 
-        while not(self.nextTurn()):
-            pass
+        self.winner = None
+
+        while self.winner is None:
+            self.nextTurn()
+        
+        if self.winner == 'Tie':
+            print('Match was a Tie!')
+        else:
+            print(f'Player {self.winner.team} Wins!!!')
 
     def nextTurn(self):
         self.turn.turn(self)
         if self.turn == self.player_1:
             self.turn = self.player_2
-            return self.checkOver(1)
         else:
             self.turn = self.player_1
-            return self.checkOver(2)
     
-    def place(self, position):
+    def place(self, x,y):
         if self.turn == self.player_1:
             key = 1
         else:
             key = 2
+        self.grid[x,y] = key 
 
-        flattened = self.grid.copy().flatten()
-        flattened[position] = key
-        flattened = flattened.reshape(self.grid.shape)
-        self.grid = flattened
+        over, condition = self.checkOver([x,y], key)
+        if over:
+            if condition == 2:
+                self.winner = 'Tie'
+            else:
+                self.winner = self.turn
 
     
-    def checkOver(self, key):
+    def checkOver(self, last_pos, key):
         """
         Check that the game is finished after each players move (check win condition of a player)
         """
-        if np.count_nonzero(self.grid == key) < self.to_win:
-            return False
-        
-        for i in range(self.grid.shape[0]):
-            temp = self.grid[i,:].flatten()
-            if np.count_nonzero(temp == key) < self.to_win:
-                continue
-            run_ends = np.where(np.diff(temp))[0] + 1
-            f = np.hstack((0, run_ends, temp.size))
-            print(f)
-            d = np.diff(f).max()
-            print(d)
 
-        
-        return False
+        # Check horizontal
+        if checkLongest(self.grid[:,last_pos[1]].flatten(), key, self.to_win):
+            return True, 1
+        # Check Verticle
+        if checkLongest(self.grid[last_pos[0],:].flatten(), key, self.to_win):
+            return True, 1
+        # Check main diagonal
+        if checkLongest(np.diagonal(self.grid.copy(), offset = last_pos[1]-last_pos[0]), key, self.to_win):
+            return True, 1
+        # Check inverse diagonal
+        if checkLongest(np.flip(np.diagonal(np.rot90(self.grid.copy()), offset = -self.grid.shape[1]+(last_pos[1]+last_pos[0])+1)), key, self.to_win):
+            return True, 1
+        # check plays remaining
+        if np.count_nonzero(self.grid==0) == 0:
+            return True, 2
+
+
+        return False, 0
 
         
 
@@ -64,3 +78,18 @@ class Environment:
         }
 
         return state
+
+
+@nb.njit()
+def checkLongest(array: np.array, k: int, goal: int):
+    cur_len = 0
+    longest = 0
+
+    for i in array:
+        if i == k:
+            cur_len += 1
+        else:
+            cur_len = 0
+        
+        longest = max(longest,cur_len)
+    return longest >= goal
