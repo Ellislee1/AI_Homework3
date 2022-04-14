@@ -6,6 +6,7 @@ A Game can be run with the following command `python run.py`. The following are 
  * `-p2`    :    Define if player 2 is a human (default `false`)
  * `-shape` :    Define the shape of the grid (default `3`)
  * `-s`     :    Defines the socre to obtain (default `3`)
+
 An example comman might be:
 
 `python run.py -p1 -shape 4 -s 3`
