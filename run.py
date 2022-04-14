@@ -7,6 +7,7 @@ def main(player1, player2, shape):
     p2 = Player('O', player2)
 
     env = Environment(p1,p2, shape)
+    env.play()
     print(env.getState())
 
 def parseShape(string):

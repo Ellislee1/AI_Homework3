@@ -9,8 +9,19 @@ class Environment:
 
         self.player_1 = player1
         self.player_2 = player2
+        self.valid_moves = set()
+
+        self.genValid()
 
         self.winner = None
+
+    def genValid(self):
+        self.valid_moves = set()
+
+        for i in range(self.grid.shape[0]):
+            for j in range(self.grid.shape[1]):
+                self.valid_moves.add(f'{j},{i}')
+        print(self.valid_moves)
 
     def play(self, turn = None):
         self.turn = turn
@@ -26,13 +37,22 @@ class Environment:
             print(f'Player {self.winner.team} Wins!!!')
 
     def nextTurn(self):
-        self.turn.turn(self)
+        success = False
+        while not success:
+            success = self.turn.turn(self)
+
         if self.turn == self.player_1:
             self.turn = self.player_2
         else:
             self.turn = self.player_1
     
     def place(self, x,y):
+        print(x,y, self.valid_moves)
+        try:
+            self.valid_moves.remove(f'{y},{x}')
+        except:
+            return False
+
         if self.turn == self.player_1:
             key = 1
         else:
@@ -45,6 +65,8 @@ class Environment:
                 self.winner = 'Tie'
             else:
                 self.winner = self.turn
+        
+        return True
 
     
     def checkOver(self, last_pos, key):
@@ -65,8 +87,8 @@ class Environment:
         if checkLongest(np.diagonal(np.rot90(self.grid.copy()), offset = -self.grid.shape[1]+(last_pos[1]+last_pos[0])+1), key, self.to_win):
             return True, 1
         # check plays remaining
-        if np.count_nonzero(self.grid==0) == 0:
-            return True, 2
+        if len(self.valid_moves) <=0:
+            return False, 2
 
 
         return False, 0
