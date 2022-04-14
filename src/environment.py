@@ -3,8 +3,8 @@ from numpy.lib.twodim_base import diag
 import numba as nb
 
 class Environment:
-    def __init__(self, player1, player2, grid_shape = (3,3), to_win = 3):
-        self.grid = np.zeros(grid_shape)
+    def __init__(self, player1, player2, grid_shape = 3, to_win = 3):
+        self.grid = np.zeros((grid_shape,grid_shape))
         self.to_win = to_win
 
         self.player_1 = player1
@@ -21,7 +21,6 @@ class Environment:
         for i in range(self.grid.shape[0]):
             for j in range(self.grid.shape[1]):
                 self.valid_moves.add(f'{j},{i}')
-        print(self.valid_moves)
 
     def play(self, turn = None):
         self.turn = turn
@@ -35,6 +34,7 @@ class Environment:
             print('Match was a Tie!')
         else:
             print(f'Player {self.winner.team} Wins!!!')
+            print(self.grid)
 
     def nextTurn(self):
         success = False
@@ -47,7 +47,6 @@ class Environment:
             self.turn = self.player_1
     
     def place(self, x,y):
-        print(x,y, self.valid_moves)
         try:
             self.valid_moves.remove(f'{y},{x}')
         except:
@@ -87,8 +86,9 @@ class Environment:
         if checkLongest(np.diagonal(np.rot90(self.grid.copy()), offset = -self.grid.shape[1]+(last_pos[1]+last_pos[0])+1), key, self.to_win):
             return True, 1
         # check plays remaining
-        if len(self.valid_moves) <=0:
-            return False, 2
+
+        if len(self.valid_moves) <= 0:
+            return True, 2
 
 
         return False, 0
