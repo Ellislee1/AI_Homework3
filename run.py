@@ -1,4 +1,5 @@
 import argparse
+import time
 from src.environment import Environment
 from src.player import Player
 from src.api import Api
@@ -19,8 +20,22 @@ def parseShape(string):
 def api():
     api = Api()
     # api.create_game('1315')
-    # api.make_move(3, 3)
+    # api.make_move(2, 2)
+    # move = api.get_opponent_move()
+    # print(move)
     print(api.get_moves())
+
+    # outline for waiting for opponent to move:
+    while True:
+        opponent_move = api.get_opponent_move()
+        if opponent_move:
+            break
+        
+        print('waiting for opponent move...')
+        # sleep for 2 seconds to slow down api calls
+        time.sleep(2)
+    
+    print('got opponent move: ', opponent_move)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process inputs for tic-tac-toe')
@@ -34,6 +49,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     shape = args.shape
     score = args.score
-    main(args.p1, args.p2, shape, score)
-    # api()
+    # main(args.p1, args.p2, shape, score)
+    api()
 
