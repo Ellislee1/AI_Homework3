@@ -1,6 +1,7 @@
 import argparse
 from src.environment import Environment
 from src.player import Player
+from src.api import Api
 
 def main(player1, player2, shape, score):
     p1 = Player('X', player1)
@@ -15,6 +16,8 @@ def parseShape(string):
 
     return(int(temp_string[0]),int(temp_string[1]))
 
+def api():
+    api = Api()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process inputs for tic-tac-toe')
@@ -28,5 +31,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     shape = args.shape
     score = args.score
-    main(args.p1, args.p2, shape, score)
+    # main(args.p1, args.p2, shape, score)
+    api()
 
