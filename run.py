@@ -18,6 +18,9 @@ def parseShape(string):
 
 def api():
     api = Api()
+    # api.create_game('1315')
+    # api.make_move(3, 3)
+    print(api.get_moves())
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process inputs for tic-tac-toe')
@@ -31,6 +34,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     shape = args.shape
     score = args.score
-    # main(args.p1, args.p2, shape, score)
-    api()
+    main(args.p1, args.p2, shape, score)
+    # api()
 
