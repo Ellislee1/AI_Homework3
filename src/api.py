@@ -12,7 +12,8 @@ class Api:
     
     def __init__(self, game_id = TEST_GAME_ID):
         self.parse_api_file()
-        self.game_id = game_id
+        self.game_id = game_id if game_id else TEST_GAME_ID
+        print(self.game_id)
         self.moves: List[Tuple[int, int]] = []
         # Added dummy user agent because the default python user-agent was being rejected
         self.headers = {'x-api-key': self.api_key, 'userid': self.user_id, 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'XY'}
