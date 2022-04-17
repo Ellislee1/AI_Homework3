@@ -7,8 +7,19 @@ def main(player1, player2, shape, score):
     p2 = Player('O', player2)
 
     env = Environment(p1,p2, shape, to_win=score)
-    env.play()
     # print(env.getState())
+    play(env)
+
+def play(env):
+    current = env.players[0]
+    i=0
+
+    while env.winner is None:
+        current.turn(env)
+        i = (i+1) % 2
+        current= env.players[i]
+    print(env.winner)
+    print(env.grid)
 
 def parseShape(string):
     temp_string = string.replace('(','').replace(')','').replace(' ','').split(',')
