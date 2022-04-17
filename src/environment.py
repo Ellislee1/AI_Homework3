@@ -5,15 +5,17 @@ import numba as nb
 class Environment:
     def __init__(self, player1, player2, grid_shape = 3, to_win = 3):
         self.grid = np.zeros((grid_shape,grid_shape))
+        self.grid_shape = grid_shape
         self.to_win = to_win
 
         self.player_1 = player1
         self.player_2 = player2
         self.valid_moves = set()
-
+        self.search_tree_node = []
         self.genValid()
 
         self.winner = None
+
 
     def genValid(self):
         self.valid_moves = set()
@@ -67,6 +69,63 @@ class Environment:
         
         return True
 
+    def findValidMoves(self, gridInput):
+        moves = set()
+        for i in range(gridInput.shape[0]):
+            for j in range(gridInput.shape[1]):
+                if(gridInput[i,j] == 1 or gridInput[i,j]== 2):
+                   moves.add(f'{i},{j}') 
+
+
+    
+    def fakePlace(self,pseudogrid, x,y):
+
+        if self.turn == self.player_1:
+            key = 1
+        else:
+            key = 2
+        pseudogrid[x,y] = key 
+
+        over, condition = self.fakeCheckOver(pseudogrid,[x,y], key)
+        if over:
+            if condition == 2:
+                self.winner = 'Tie'
+            else:
+                self.winner = self.turn
+        
+        return True
+
+
+            
+
+            
+
+    def fakeCheckOver(self, fakeGrid, last_pos, key):
+        """
+        Check that the game is finished after each players move (check win condition of a player)
+        """
+
+        # Check horizontal
+        if checkLongest(fakeGrid[:,last_pos[1]].flatten(), key, self.to_win):
+            return True, 1
+        # Check Verticle
+        if checkLongest(fakeGrid[last_pos[0],:].flatten(), key, self.to_win):
+            return True, 1
+        # Check main diagonal
+        if checkLongest(np.diagonal(fakeGrid.copy(), offset = last_pos[1]-last_pos[0]), key, self.to_win):
+            return True, 1
+        # Check inverse diagonal
+        if checkLongest(np.diagonal(np.rot90(fakeGrid.copy()), offset = -fakeGrid.shape[1]+(last_pos[1]+last_pos[0])+1), key, self.to_win):
+            return True, 1
+        # check plays remaining
+
+        if len(self.valid_moves) <= 0:
+            return True, 2
+
+
+        return False, 0
+        
+
     
     def checkOver(self, last_pos, key):
         """
@@ -115,3 +174,10 @@ def checkLongest(array: np.array, k: int, goal: int):
         
         longest = max(longest,cur_len)
     return longest >= goal
+
+
+    
+
+
+        
+
