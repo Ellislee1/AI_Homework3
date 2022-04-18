@@ -18,7 +18,10 @@ def play(env):
         current.turn(env)
         i = (i+1) % 2
         current= env.players[i]
-    print(env.winner)
+    try:
+        print(env.winner.team)
+    except:
+        print("Tie")
     print(env.grid)
 
 def parseShape(string):

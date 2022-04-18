@@ -80,6 +80,10 @@ class Environment:
         state = {'grid': self.grid}
         return state
 
+    def __hash__(self):
+        s = self.grid.tostring()
+        return hash(s)
+
 @nb.njit()
 def checkLongest(array: np.array, k: int, goal: int):
     cur_len = 0
