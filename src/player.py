@@ -29,5 +29,6 @@ class Player:
             return env
         pos = best_move
 
+        print(pos)
         return env.place(pos[1],pos[0], self)
 

@@ -1,6 +1,7 @@
 import argparse
 from src.environment import Environment
 from src.player import Player
+import numpy as np
 
 def main(player1, player2, shape, score):
     p1 = Player('X', player1)
@@ -11,8 +12,8 @@ def main(player1, player2, shape, score):
     play(env)
 
 def play(env):
-    current = env.players[0]
-    i=0
+    i = np.random.randint(2)
+    current = env.players[i]
 
     while env.winner is None:
         current.turn(env)
