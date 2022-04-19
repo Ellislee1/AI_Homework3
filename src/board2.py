@@ -26,10 +26,12 @@ class Board:
     
     @property
     def is_terminal(self):
+        p = self.players[0] if self.turn == self.players[1] else self.players[1]
+
         for y in range(self.board.shape[0]):
             for x in range(self.board.shape[1]):
                 for _, c in self.condition.items():
-                    if c(x,y,1) or c(x,y,2):
+                    if c(x,y,p.icon):
                         return True
                 
         return False
@@ -67,6 +69,9 @@ class Board:
                 length = 0
             
             max_length = max(max_length, length)
+
+            if max_length >= l:
+                return True
         
         return max_length >= l
 
