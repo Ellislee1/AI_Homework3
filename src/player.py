@@ -2,7 +2,7 @@ import random
 from src.minimax import findBest
 
 class Player:
-    def __init__(self, shape='X', human = False):
+    def __init__(self, shape='X', human = False, online = False):
         self.team = shape
         self.human = human
     
