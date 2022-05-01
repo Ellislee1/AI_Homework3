@@ -30,24 +30,19 @@ class Environment:
         self.turn = player
         try:
             self.valid_moves.remove(f'{y},{x}')
-        except:
+        except Exception:
             print('here',x,y)
             return False
 
-        if player == self.players[0]:
-            key = 1
-        else:
-            key = 2
+
+        key = 1 if player == self.players[0] else 2
         self.grid[x,y] = key 
 
         print(x,y)
         over, condition = self.checkOver([x,y], key)
         if over:
-            if condition == 2:
-                self.winner = 'Tie'
-            else:
-                self.winner = player
-        
+
+            self.winner = 'Tie' if condition == 2 else player
         return True
 
     def placeCopy(self, x, y, player):
@@ -87,8 +82,7 @@ class Environment:
         return False, 0
 
     def getState(self):
-        state = {'grid': self.grid}
-        return state
+        return {'grid': self.grid}
 
     def __hash__(self):
         s = ""
