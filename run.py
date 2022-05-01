@@ -27,6 +27,25 @@ def play(env):
         print("Tie")
     print(env.grid)
 
+def parseShape(string):
+    temp_string = string.replace('(','').replace(')','').replace(' ','').split(',')
+
+    return(int(temp_string[0]),int(temp_string[1]))
+
+def play(env):
+    current = env.players[0]
+    i=0
+
+    while env.winner is None:
+        current.turn(env)
+        i = (i+1) % 2
+        current= env.players[i]
+    try:
+        print(env.winner.team)
+    except Exception:
+        print("Tie")
+    print(env.grid)
+
 def api(game_key: str):
     api = Api(game_key)
     # api.create_game('1315')

@@ -27,11 +27,13 @@ class Environment:
         except Exception:
             return False
 
+
         key = 1 if player == self.players[0] else 2
         self.grid[x,y] = key 
 
         over, condition = self.checkOver([x,y], key)
         if over:
+
             self.winner = 'Tie' if condition == 2 else player
         return True
 
