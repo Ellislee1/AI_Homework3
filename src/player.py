@@ -1,4 +1,5 @@
 import random
+from src.minimax import findBest
 
 class Player:
     def __init__(self, shape='X', human = False, online = False):
@@ -19,13 +20,14 @@ class Player:
         for i, val in enumerate(pos):
             pos[i] = int(val)
 
-        return env.place(pos[1],pos[0])
+        return env.place(pos[1],pos[0], self)
     
     def bot(self, env):
-        pos = random.sample(env.valid_moves,1)[0]
-        pos = pos.split(',')
-        for i, val in enumerate(pos):
-            pos[i] = int(val)
+        best_move = findBest(env, self)
 
-        return env.place(pos[1],pos[0])
+        if best_move is None:
+            return env
+        pos = best_move
+
+        return env.place(pos[1],pos[0], self)
 

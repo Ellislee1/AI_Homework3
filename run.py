@@ -8,15 +8,24 @@ def main(player1, player2, shape, score, game_key = None):
     p1 = Player('X', player1)
 
     # If we have a game key then atleast one player should take actions through the API so it has to be a bot.
-    if game_key is not None:
-        p2 = Player('O', True, True)
-    else:
-        p2 = Player('O', player2)
-
-
+    p2 = Player('O', True, True) if game_key is not None else Player('O', player2)
     env = Environment(p1,p2, shape, to_win=score)
-    env.play()
     # print(env.getState())
+    play(env)
+
+def play(env):
+    current = env.players[0]
+    i=0
+
+    while env.winner is None:
+        current.turn(env)
+        i = (i+1) % 2
+        current= env.players[i]
+    try:
+        print(env.winner.team)
+    except Exception:
+        print("Tie")
+    print(env.grid)
 
 def api(game_key: str):
     api = Api(game_key)

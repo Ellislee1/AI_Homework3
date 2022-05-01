@@ -1,14 +1,13 @@
 import numpy as np
-from numpy.lib.twodim_base import diag
 import numba as nb
+import copy
 
 class Environment:
     def __init__(self, player1, player2, grid_shape = 3, to_win = 3):
         self.grid = np.zeros((grid_shape,grid_shape))
         self.to_win = to_win
 
-        self.player_1 = player1
-        self.player_2 = player2
+        self.players = [player1, player2]
         self.valid_moves = set()
 
         self.genValid()
@@ -21,51 +20,28 @@ class Environment:
         for i in range(self.grid.shape[0]):
             for j in range(self.grid.shape[1]):
                 self.valid_moves.add(f'{j},{i}')
-
-    def play(self, turn = None):
-        self.turn = turn
-        if self.turn is None:
-            self.turn = np.random.choice([self.player_1,self.player_2],1)[0]
-
-        while self.winner is None:
-            self.nextTurn()
-        
-        if self.winner == 'Tie':
-            print('Match was a Tie!')
-        else:
-            print(f'Player {self.winner.team} Wins!!!')
-            print(self.grid)
-
-    def nextTurn(self):
-        success = False
-        while not success:
-            success = self.turn.turn(self)
-
-        if self.turn == self.player_1:
-            self.turn = self.player_2
-        else:
-            self.turn = self.player_1
     
-    def place(self, x,y):
+    def place(self, x,y, player):
         try:
             self.valid_moves.remove(f'{y},{x}')
-        except:
+        except Exception:
             return False
 
-        if self.turn == self.player_1:
-            key = 1
-        else:
-            key = 2
+        key = 1 if player == self.players[0] else 2
         self.grid[x,y] = key 
 
         over, condition = self.checkOver([x,y], key)
         if over:
-            if condition == 2:
-                self.winner = 'Tie'
-            else:
-                self.winner = self.turn
-        
+            self.winner = 'Tie' if condition == 2 else player
         return True
+
+    def placeCopy(self, x, y, player):
+        env_copy = copy.deepcopy(self)
+
+        env_copy.place(x, y, player)
+
+        return env_copy
+
 
     
     def checkOver(self, last_pos, key):
@@ -94,13 +70,11 @@ class Environment:
         return False, 0
 
     def getState(self):
-        state = {
-            'grid': self.grid.copy(),
-            'turn': self.turn
-        }
+        return {'grid': self.grid}
 
-        return state
-
+    def __hash__(self):
+        s = self.grid.tostring()
+        return hash(s)
 
 @nb.njit()
 def checkLongest(array: np.array, k: int, goal: int):
