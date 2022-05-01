@@ -6,7 +6,7 @@ visited = {}
 
 
 
-def find_best(board, max_depth=4):
+def find_best(board, max_depth=5):
     global visited
     visited = {}
     best_eval = float("-inf")
@@ -16,7 +16,7 @@ def find_best(board, max_depth=4):
     best_move = valid[-1]
 
     for move in valid:
-        result = minimax(board.move(move), True, board.turn, 1, max_depth, float('-inf'), float('inf'))
+        result = minimax(board.move(move), False, board.turn, 1, max_depth, float('-inf'), float('inf'))
 
         if result > best_eval:
             best_eval = result
@@ -79,4 +79,5 @@ def minimax(board, maximise, origional_player, depth, max_depth, alpha, beta):
             beta = min(beta, worst_score)
 
         return worst_score
+
 

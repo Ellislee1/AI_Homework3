@@ -2,10 +2,10 @@ from src.board2 import Board
 from src.actor import Actor
 import numpy as np
 
-p1 = Actor(1)
+p1 = Actor(1, True)
 p2 = Actor(2,True)
 
-b = Board(np.zeros((8,8)),p1,[p1,p2],5)
+b = Board(np.zeros((16,16)),p1,[p1,p2],6)
 
 move = None
 

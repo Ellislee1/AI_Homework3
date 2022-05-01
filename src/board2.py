@@ -1,8 +1,11 @@
+import itertools
 import numpy as np
 import numba as nb
 
 class Board:
-    def __init__(self, board, turn, players, win_score, moves = []):
+    def __init__(self, board, turn, players, win_score, moves = None):
+        if moves is None:
+            moves = []
         self.board = board
         self.turn = turn
         self.players = players
@@ -38,38 +41,40 @@ class Board:
         y,x = self.moves[-1][0], self.moves[-1][1]
         p = self.players[0] if self.turn == self.players[1] else self.players[1]
 
-        # for y in range(self.board.shape[0]):
-        #     for x in range(self.board.shape[1]):
-        for i, c in self.condition.items():
-            if c(x,y,p.icon):
-                return True
-            
-                
-        return False
+        return any(c(x,y,p.icon) for i, c in self.condition.items())
 
     @property
     def is_draw(self):
         return (not self.is_terminal) and (len(self.legal_moves) == 0)
 
-    @property 
+    @property
     def legal_moves(self):
         valid = []
         distance = []
 
-        for y in range(self.board.shape[0]):
-            for x in range(self.board.shape[1]): 
-                if self.board[y,x] == 0:
-                    if len(self.moves) >0:
-                        d = max(abs(self.moves[-1][0]-y),abs(self.moves[-1][1]-x))
-                        distance.append(d)
+        for y, x in itertools.product(range(self.board.shape[0]), range(self.board.shape[1])):
+            if self.board[y,x] == 0:
+                if len(self.moves) > 1:
+                    d = min(max(abs(self.moves[-1][0]-y),abs(self.moves[-1][1]-x)), max(abs(self.moves[-2][0]-y),abs(self.moves[-2][1]-x)))
+                    distance.append(d)
+                elif len(self.moves) > 0:
+                    d = max(abs(self.moves[-1][0]-y),abs(self.moves[-1][1]-x))
+                    distance.append(d)
 
-                    valid.append([y,x])
-        
+
+
+                valid.append([y,x])
+
 
         valid = np.array(valid)
-        if len(self.moves) > 0 and self.turn.bot:
+        if distance and self.turn.bot:
             order = np.argsort(distance)[:8]
             valid = valid[order]
+        else:
+            np.random.shuffle(valid)
+            valid = valid [:8]
+
+        np.random.shuffle(valid)
         return valid
     
     def print(self):
@@ -79,11 +84,8 @@ class Board:
         print('\n')
 
     def _eval(self, player):
-        if self.is_terminal and self.turn != player:
-            return 1
-        if self.is_terminal and self.turn == player:
-            return -1
-        
+        if self.is_terminal:
+            return 1 if self.turn != player else -1
         return 0
 
     def count_pieces(self, player):

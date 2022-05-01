@@ -21,7 +21,7 @@ def play(env):
         current= env.players[i]
     try:
         print(env.winner.team)
-    except:
+    except Exception:
         print("Tie")
     print(env.grid)
 
