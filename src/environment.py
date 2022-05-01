@@ -10,6 +10,8 @@ class Environment:
         self.players = [player1, player2]
         self.valid_moves = set()
 
+        self.turn = None
+
         self.genValid()
 
         self.winner = None
@@ -19,18 +21,24 @@ class Environment:
 
         for i in range(self.grid.shape[0]):
             for j in range(self.grid.shape[1]):
-                self.valid_moves.add(f'{j},{i}')
+                if self.grid[i,j] == 0:
+                    self.valid_moves.add(f'{j},{i}')
+        
+        self.valid_moves = sorted(self.valid_moves)
     
     def place(self, x,y, player):
+        self.turn = player
         try:
             self.valid_moves.remove(f'{y},{x}')
         except Exception:
+            print('here',x,y)
             return False
 
 
         key = 1 if player == self.players[0] else 2
         self.grid[x,y] = key 
 
+        print(x,y)
         over, condition = self.checkOver([x,y], key)
         if over:
 
@@ -51,17 +59,19 @@ class Environment:
         Check that the game is finished after each players move (check win condition of a player)
         """
 
+        x,y = last_pos[0],last_pos[1]
+
         # Check horizontal
-        if checkLongest(self.grid[:,last_pos[1]].flatten(), key, self.to_win):
+        if checkLongest(self.grid[:,x].flatten(), key, self.to_win):
             return True, 1
         # Check Verticle
-        if checkLongest(self.grid[last_pos[0],:].flatten(), key, self.to_win):
+        if checkLongest(self.grid[y,:].flatten(), key, self.to_win):
             return True, 1
         # Check main diagonal
-        if checkLongest(np.diagonal(self.grid.copy(), offset = last_pos[1]-last_pos[0]), key, self.to_win):
+        if checkLongest(np.diagonal(self.grid.copy(), offset = x-y), key, self.to_win):
             return True, 1
         # Check inverse diagonal
-        if checkLongest(np.diagonal(np.rot90(self.grid.copy()), offset = -self.grid.shape[1]+(last_pos[1]+last_pos[0])+1), key, self.to_win):
+        if checkLongest(np.diagonal(np.rot90(self.grid.copy()), offset = -self.grid.shape[1]+(x+y)+1), key, self.to_win):
             return True, 1
         # check plays remaining
 
@@ -75,11 +85,14 @@ class Environment:
         return {'grid': self.grid}
 
     def __hash__(self):
-        s = self.grid.tostring()
+        s = ""
+        for i in self.grid:
+            for j in i:
+                s += f'{j}'
+            s+='|'
         return hash(s)
 
-@nb.njit()
-def checkLongest(array: np.array, k: int, goal: int):
+def checkLongest(array, k, goal):
     cur_len = 0
     longest = 0
 

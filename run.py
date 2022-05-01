@@ -2,6 +2,7 @@ import argparse
 import time
 from src.environment import Environment
 from src.player import Player
+import numpy as np
 from src.api import Api
 
 def main(player1, player2, shape, score, game_key = None):
@@ -14,8 +15,8 @@ def main(player1, player2, shape, score, game_key = None):
     play(env)
 
 def play(env):
-    current = env.players[0]
-    i=0
+    i = np.random.randint(2)
+    current = env.players[i]
 
     while env.winner is None:
         current.turn(env)
